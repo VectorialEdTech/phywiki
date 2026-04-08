@@ -1,0 +1,1961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSIR NET Physics — Vectorial Edtech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  /* ── Reset & Variables ── */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0b;
+    --surface: #111113;
+    --surface2: #18181c;
+    --border: #222228;
+    --border2: #2e2e38;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --accent: #7c6fff;
+    --accent2: #5bf0c0;
+    --accent3: #ff6b6b;
+    --accent4: #ffc96b;
+    --glow: rgba(124,111,255,0.15);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Noise texture overlay ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ── Pages ── */
+  .page { display: none; min-height: 100vh; position: relative; z-index: 1; }
+  .page.active { display: block; animation: fadeUp 0.5s ease forwards; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Navigation ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 0 2rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(10,10,11,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .nav-logo span {
+    color: var(--accent);
+  }
+
+  .nav-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    border: 1px solid var(--border2);
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+
+  .back-btn {
+    display: none;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+    background: none;
+    border: none;
+  }
+  .back-btn:hover { color: var(--text); }
+  .back-btn.visible { display: flex; }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 140px 2rem 80px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.6rem, 6vw, 4.8rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.4rem;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero-desc {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 520px;
+    line-height: 1.75;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: var(--text);
+  }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── Divider ── */
+  .section-header {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-header h2 {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .section-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── Cards Grid ── */
+  .cards-grid {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2rem 6rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .card {
+    background: var(--surface);
+    padding: 2rem 1.8rem;
+    cursor: pointer;
+    transition: background 0.25s, transform 0.25s;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--glow);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .card:hover { background: var(--surface2); }
+  .card:hover::before { opacity: 1; }
+
+  .card-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+    filter: grayscale(0.2);
+  }
+
+  .card-num {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--border2);
+    letter-spacing: 0.1em;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .card-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  .card-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 2px;
+    border: 1px solid;
+    width: fit-content;
+  }
+
+  .card-arrow {
+    position: absolute;
+    bottom: 1.8rem;
+    right: 1.8rem;
+    font-size: 0.9rem;
+    color: var(--muted);
+    transition: transform 0.25s, color 0.25s;
+  }
+
+  .card:hover .card-arrow { transform: translate(3px, -3px); color: var(--accent); }
+
+  /* Color accents per card */
+  .c1 { --c: var(--accent); }
+  .c2 { --c: var(--accent2); }
+  .c3 { --c: var(--accent3); }
+  .c4 { --c: var(--accent4); }
+  .c5 { --c: #f06fff; }
+  .c6 { --c: #6fefff; }
+  .c7 { --c: #ff9f6f; }
+  .c8 { --c: var(--accent2); }
+
+  .card-tag { color: var(--c); border-color: var(--c); opacity: 0.85; }
+  .card:hover .card-title { color: var(--c); }
+
+  /* ── Inner Page ── */
+  .inner-hero {
+    padding: 110px 2rem 60px;
+    max-width: 860px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 3rem;
+  }
+
+  .inner-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    border: 1px solid rgba(124,111,255,0.3);
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  .inner-hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+
+  .inner-hero p {
+    font-size: 0.95rem;
+    color: var(--muted);
+    max-width: 540px;
+    line-height: 1.8;
+  }
+
+  /* ── Content Sections ── */
+  .content-area {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 2rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .topic-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.4rem 1.8rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    position: relative;
+  }
+
+  .topic-row:hover {
+    background: var(--surface2);
+    border-color: var(--border2);
+  }
+
+  .topic-row-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--border2);
+    min-width: 28px;
+    padding-top: 3px;
+    letter-spacing: 0.05em;
+  }
+
+  .topic-row-body { flex: 1; }
+
+  .topic-row-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-bottom: 0.3rem;
+    transition: color 0.2s;
+  }
+
+  .topic-row:hover .topic-row-title { color: var(--accent); }
+
+  .topic-row-meta {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .topic-row-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    padding: 2px 7px;
+    border: 1px solid var(--border2);
+    border-radius: 2px;
+    color: var(--muted);
+    white-space: nowrap;
+    align-self: center;
+  }
+
+  .topic-row-arrow {
+    align-self: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    transition: transform 0.2s, color 0.2s;
+  }
+
+  .topic-row:hover .topic-row-arrow { transform: translateX(4px); color: var(--accent); }
+
+  /* ── Info Cards inside inner page ── */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 2px;
+  }
+
+  .info-card {
+    background: var(--surface);
+    padding: 1.4rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .info-card-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .info-card-val {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--text);
+  }
+
+  .info-card-sub {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .hero { padding-top: 100px; }
+    .cards-grid { grid-template-columns: 1fr; }
+    .info-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* ── New card accent colors ── */
+  .c9  { --c: #e8ff6f; }
+  .c10 { --c: #ff6fbb; }
+
+  /* ── Year filter tabs ── */
+  .filter-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .filter-tab {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    padding: 5px 14px;
+    border: 1px solid var(--border2);
+    border-radius: 2px;
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .filter-tab:hover { border-color: var(--accent); color: var(--text); }
+  .filter-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ── PYQ Accordion ── */
+  .pyq-year-group { margin-bottom: 2px; }
+
+  .pyq-year-header {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.1rem 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .pyq-year-header:hover { background: var(--surface2); }
+
+  .pyq-year-label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .pyq-year-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  .pyq-chevron {
+    font-size: 0.7rem;
+    color: var(--muted);
+    transition: transform 0.3s;
+  }
+
+  .pyq-year-group.open .pyq-chevron { transform: rotate(180deg); }
+
+  .pyq-questions {
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 2px;
+  }
+
+  .pyq-year-group.open .pyq-questions { display: flex; }
+
+  .pyq-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 2px solid transparent;
+    padding: 1.2rem 1.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .pyq-item:hover { border-left-color: var(--accent); background: var(--surface2); }
+  .pyq-item.open { border-left-color: var(--accent2); }
+
+  .pyq-q {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .pyq-q-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    min-width: 28px;
+    padding-top: 2px;
+  }
+
+  .pyq-q-text {
+    font-size: 0.88rem;
+    color: var(--text);
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  .pyq-q-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.07em;
+    padding: 2px 7px;
+    border-radius: 2px;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .pyq-answer {
+    display: none;
+    margin-top: 1rem;
+    padding: 1rem 1.2rem;
+    background: rgba(91,240,192,0.05);
+    border: 1px solid rgba(91,240,192,0.15);
+    border-radius: 2px;
+    margin-left: 2.4rem;
+  }
+
+  .pyq-item.open .pyq-answer { display: block; }
+
+  .pyq-answer-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .pyq-answer-text {
+    font-size: 0.83rem;
+    color: var(--text);
+    line-height: 1.75;
+  }
+
+  /* ── Mock Test ── */
+  .mock-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .mock-select {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 7px 14px;
+    border-radius: 2px;
+    cursor: pointer;
+    appearance: none;
+    letter-spacing: 0.05em;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .mock-select:focus { border-color: var(--accent); }
+
+  .mock-start-btn {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    padding: 8px 22px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+
+  .mock-start-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+
+  /* Quiz setup panel */
+  .quiz-setup { display: block; }
+  .quiz-engine { display: none; }
+  .quiz-result { display: none; }
+
+  /* Quiz engine */
+  .quiz-progress-bar {
+    height: 2px;
+    background: var(--border);
+    border-radius: 1px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+
+  .quiz-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 1px;
+    transition: width 0.4s ease;
+  }
+
+  .quiz-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .quiz-counter {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .quiz-timer {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent4);
+    letter-spacing: 0.08em;
+  }
+
+  .quiz-q-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .quiz-q-unit {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 1.8rem;
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 2rem;
+  }
+
+  .quiz-option {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1rem 1.4rem;
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.18s;
+    font-size: 0.88rem;
+    color: var(--text);
+  }
+
+  .quiz-option:hover:not(.disabled) { border-color: var(--accent); background: var(--surface2); }
+
+  .quiz-option.correct { border-color: var(--accent2); background: rgba(91,240,192,0.07); color: var(--accent2); }
+  .quiz-option.wrong   { border-color: var(--accent3); background: rgba(255,107,107,0.07); color: var(--accent3); }
+  .quiz-option.disabled { cursor: default; }
+
+  .quiz-option-letter {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    min-width: 18px;
+  }
+
+  .quiz-option.correct .quiz-option-letter { color: var(--accent2); }
+  .quiz-option.wrong   .quiz-option-letter { color: var(--accent3); }
+
+  .quiz-explanation {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent2);
+    padding: 1rem 1.4rem;
+    margin-bottom: 1.5rem;
+    display: none;
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.7;
+    border-radius: 0 2px 2px 0;
+  }
+
+  .quiz-explanation.visible { display: block; }
+
+  .quiz-explanation strong { color: var(--accent2); font-weight: 500; }
+
+  .quiz-next-btn {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    padding: 10px 28px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    display: none;
+    transition: opacity 0.2s;
+  }
+
+  .quiz-next-btn.visible { display: inline-block; }
+  .quiz-next-btn:hover { opacity: 0.85; }
+
+  /* Results */
+  .result-ring {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    box-shadow: 0 0 32px rgba(124,111,255,0.2);
+  }
+
+  .result-score {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2.2rem;
+    line-height: 1;
+  }
+
+  .result-of {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+
+  .result-cell {
+    background: var(--surface);
+    padding: 1.2rem;
+    text-align: center;
+  }
+
+  .result-cell-val {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.6rem;
+  }
+
+  .result-cell-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .result-retake-btn {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    padding: 10px 28px;
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .result-retake-btn:hover { background: var(--accent); color: #fff; }
+
+  /* ── Vectorial brand footer ── */
+  .brand-footer {
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: gap;
+    gap: 1rem;
+  }
+
+  .brand-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: -0.01em;
+  }
+
+  .brand-name span { color: var(--accent); }
+
+  .brand-tagline {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    margin-top: 2px;
+  }
+
+  .brand-links {
+    display: flex;
+    gap: 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  .brand-links a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+  .brand-links a:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav>
+  <div class="nav-logo" onclick="showPage('home')">
+    <span>Vectorial</span>
+    <div style="width:1px;height:14px;background:var(--border2);margin:0 6px"></div>
+    <span style="color:var(--muted);font-weight:400;font-size:0.82rem;letter-spacing:0.06em">CSIR NET PHYSICS</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <button class="back-btn" id="backBtn" onclick="showPage('home')">
+      ← Back to Hub
+    </button>
+    <div class="nav-tag">JUNE 2025</div>
+  </div>
+</nav>
+
+<!-- ════════════════════════════ HOME PAGE ════════════════════════════ -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="hero-eyebrow">Vectorial Edtech — Physical Sciences</div>
+    <h1>Master <em>Physics.</em><br>Crack the NET.</h1>
+    <p class="hero-desc">
+      A structured study hub for CSIR NET Physical Sciences — organized by syllabus units, with curated resources, topic breakdowns, PYQs, and mock tests.
+    </p>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">8</div>
+        <div class="stat-label">Core Subjects</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">120+</div>
+        <div class="stat-label">Topics Covered</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">10+</div>
+        <div class="stat-label">Years of PYQs</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Mock Tests</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-header"><h2>Subject Modules</h2></div>
+
+  <div class="cards-grid">
+
+    <div class="card c1" onclick="showPage('classical')">
+      <div class="card-num">01</div>
+      <div class="card-icon">⚙️</div>
+      <div class="card-title">Classical Mechanics</div>
+      <div class="card-desc">Lagrangian & Hamiltonian formulations, central force problems, rigid body dynamics, chaos & nonlinear systems.</div>
+      <div class="card-tag">● Core Unit</div>
+      <div class="card-arrow">↗</div>
+    </div>
+
+    <div class="card c2" onclick="showPage('electrodynamics')">
+      <div class="card-num">02</div>
+      <div class="card-icon">⚡</div>
+      <div class="card-title">Electrodynamics</div>
+      <div class="card-desc">Maxwell's equations, electromagnetic waves, radiation, special relativity, gauge theory fundamentals.</div>
+      <div class="card-tag">● Core Unit</div>
+      <div class="card-arrow">↗</div>
+    </div>
+
+    <div class="card c3" onclick="showPage('quantum')">
+      <div class="card-num">03</div>
+      <div class="card-icon">🌊</div>
+      <div class="card-title">Quantum Mechanics</div>
+      <div class="card-desc">Schrödinger equation, operators & observables, perturbation theory, scattering, identical particles.</div>
+      <div class="card-tag">● High Weightage</div>
+      <div class="card-arrow">↗</div>
+    </div>
+
+    <div class="card c4" onclick="showPage('thermodynamics')">
+      <div class="card-num">04</div>
+      <div class="card-icon">🔥</div>
+      <div class="card-title">Thermodynamics & Stat. Mech.</div>
+      <div class="card-desc">Laws of thermodynamics, ensembles, partition functions, phase transitions, Bose–Einstein & Fermi–Dirac statistics.</div>
+      <div class="card-tag">● Core Unit</div>
+      <div class="card-arrow">↗</div>
+    </div>
+
+    <div class="card c5" onclick="showPage('mathematical')">
+      <div class="card-num">05</div>
+      <div class="card-icon">∑</div>
+      <div class="card-title">Mathematical Physics</div>
+      <div class="card-desc">Complex analysis, differential equations, special functions, tensors, group theory basics, Green's functions.</div>
+      <div class="card-tag">● Foundation</div>
+      <div class="card-arrow">↗</div>
+    </div>
+
+    <div class="card c6" onclick="showPage('solid-state')">
+      <div class="card-num">06</div>
+      <div class="card-icon">💎</div>
+      <div class="card-title">Solid State Physics</div>
+      <div class="card-desc">Crystal structures, band theory, semiconductors, phonons, superconductivity, magnetic properties of matter.</div>
+      <div class="card-tag">● Applied</div>
+      <div class="card-arrow">↗</div>
+    </div>
+
+    <div class="card c7" onclick="showPage('nuclear')">
+      <div class="card-num">07</div>
+      <div class="card-icon">☢️</div>
+      <div class="card-title">Nuclear & Particle Physics</div>
+      <div class="card-desc">Nuclear models, radioactive decay, fission & fusion, elementary particles, quarks, standard model overview.</div>
+      <div class="card-tag">● Applied</div>
+      <div class="card-arrow">↗</div>
+    </div>
+
+    <div class="card c8" onclick="showPage('electronics')">
+      <div class="card-num">08</div>
+      <div class="card-icon">🔌</div>
+      <div class="card-title">Electronics & Devices</div>
+      <div class="card-desc">Semiconductors, diodes, transistors, op-amps, digital logic, A/D-D/A converters, microprocessor basics.</div>
+      <div class="card-tag">● Applied</div>
+      <div class="card-arrow">↗</div>
+    </div>
+
+  </div>
+
+  <div class="section-header" style="margin-top:3rem"><h2>Practice & Exam Prep</h2></div>
+
+  <div class="cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px,1fr))">
+
+    <div class="card c9" onclick="showPage('pyq')">
+      <div class="card-num">PYQ</div>
+      <div class="card-icon">📄</div>
+      <div class="card-title">Previous Year Questions</div>
+      <div class="card-desc">Solved PYQs from 2013–2024 organized by year and subject with detailed step-by-step answers and key insights.</div>
+      <div class="card-tag">● 10+ Years</div>
+      <div class="card-arrow">↗</div>
+    </div>
+
+    <div class="card c10" onclick="showPage('mock')">
+      <div class="card-num">TEST</div>
+      <div class="card-icon">🧪</div>
+      <div class="card-title">Mock Test</div>
+      <div class="card-desc">Full-length and topic-wise mock tests with instant scoring, explanations, and performance breakdown. Simulate exam day.</div>
+      <div class="card-tag">● Adaptive</div>
+      <div class="card-arrow">↗</div>
+    </div>
+
+  </div>
+
+  <div class="brand-footer">
+    <div>
+      <div class="brand-name"><span>Vectorial</span> Edtech</div>
+      <div class="brand-tagline">EMPOWERING CSIR NET ASPIRANTS · INDIA</div>
+    </div>
+    <div class="brand-links">
+      <a href="#">About</a>
+      <a href="#">Courses</a>
+      <a href="#">Contact</a>
+      <a href="#">© 2025</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════ CLASSICAL MECHANICS ════════════════════════════ -->
+<div class="page" id="page-classical">
+  <section class="inner-hero">
+    <div class="inner-badge">⚙️ &nbsp; Module 01</div>
+    <h1>Classical Mechanics</h1>
+    <p>From Newton to chaos — the full classical framework tested in CSIR NET. Focus on variational principles, canonical transformations, and stability analysis.</p>
+  </section>
+
+  <div class="content-area">
+    <div class="info-grid">
+      <div class="info-card"><div class="info-card-label">Expected Questions</div><div class="info-card-val">8–12</div><div class="info-card-sub">Out of Part B+C</div></div>
+      <div class="info-card"><div class="info-card-label">Weightage</div><div class="info-card-val">~18%</div><div class="info-card-sub">In Part C</div></div>
+      <div class="info-card"><div class="info-card-label">Difficulty</div><div class="info-card-val">High</div><div class="info-card-sub">Conceptual + Calc.</div></div>
+      <div class="info-card"><div class="info-card-label">Key Book</div><div class="info-card-val" style="font-size:0.9rem">Goldstein</div><div class="info-card-sub">Classical Mechanics</div></div>
+    </div>
+
+    <div class="topic-row"><div class="topic-row-num">01</div><div class="topic-row-body"><div class="topic-row-title">Newtonian Mechanics & Constraints</div><div class="topic-row-meta">D'Alembert's principle, holonomic constraints, generalized coordinates</div></div><div class="topic-row-badge">Beginner</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">02</div><div class="topic-row-body"><div class="topic-row-title">Lagrangian Formulation</div><div class="topic-row-meta">Euler–Lagrange equations, cyclic coordinates, conservation laws</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">03</div><div class="topic-row-body"><div class="topic-row-title">Hamiltonian Mechanics</div><div class="topic-row-meta">Hamilton's equations, Poisson brackets, Liouville's theorem</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">04</div><div class="topic-row-body"><div class="topic-row-title">Canonical Transformations</div><div class="topic-row-meta">Generating functions, Hamilton–Jacobi equation, action-angle variables</div></div><div class="topic-row-badge">Advanced</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">05</div><div class="topic-row-body"><div class="topic-row-title">Central Force Problems</div><div class="topic-row-meta">Kepler problem, orbits, effective potential, Rutherford scattering</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">06</div><div class="topic-row-body"><div class="topic-row-title">Rigid Body Dynamics</div><div class="topic-row-meta">Euler angles, moment of inertia tensor, Euler's equations, torque-free motion</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">07</div><div class="topic-row-body"><div class="topic-row-title">Small Oscillations & Normal Modes</div><div class="topic-row-meta">Coupled oscillators, eigenvalue problem, normal coordinates</div></div><div class="topic-row-badge">Important</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">08</div><div class="topic-row-body"><div class="topic-row-title">Nonlinear Dynamics & Chaos</div><div class="topic-row-meta">Phase space, fixed points, Lyapunov exponents, strange attractors</div></div><div class="topic-row-badge">Advanced</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">09</div><div class="topic-row-body"><div class="topic-row-title">Special Theory of Relativity</div><div class="topic-row-meta">Lorentz transformations, 4-vectors, relativistic mechanics, covariant formulation</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════ ELECTRODYNAMICS ════════════════════════════ -->
+<div class="page" id="page-electrodynamics">
+  <section class="inner-hero">
+    <div class="inner-badge">⚡ &nbsp; Module 02</div>
+    <h1>Electrodynamics</h1>
+    <p>Maxwell's framework, electromagnetic waves, and relativistic electrodynamics. Boundary value problems are heavily tested in CSIR NET.</p>
+  </section>
+
+  <div class="content-area">
+    <div class="info-grid">
+      <div class="info-card"><div class="info-card-label">Expected Questions</div><div class="info-card-val">10–14</div><div class="info-card-sub">Out of Part B+C</div></div>
+      <div class="info-card"><div class="info-card-label">Weightage</div><div class="info-card-val">~20%</div><div class="info-card-sub">In Part C</div></div>
+      <div class="info-card"><div class="info-card-label">Difficulty</div><div class="info-card-val">High</div><div class="info-card-sub">Math-intensive</div></div>
+      <div class="info-card"><div class="info-card-label">Key Book</div><div class="info-card-val" style="font-size:0.9rem">Griffiths</div><div class="info-card-sub">Introduction to ED</div></div>
+    </div>
+
+    <div class="topic-row"><div class="topic-row-num">01</div><div class="topic-row-body"><div class="topic-row-title">Electrostatics</div><div class="topic-row-meta">Coulomb's law, Gauss's law, electric potential, Laplace & Poisson equations</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">02</div><div class="topic-row-body"><div class="topic-row-title">Boundary Value Problems</div><div class="topic-row-meta">Method of images, separation of variables, multipole expansion</div></div><div class="topic-row-badge">Important</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">03</div><div class="topic-row-body"><div class="topic-row-title">Magnetostatics</div><div class="topic-row-meta">Biot–Savart law, Ampere's law, magnetic vector potential, magnetic dipole</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">04</div><div class="topic-row-body"><div class="topic-row-title">Maxwell's Equations</div><div class="topic-row-meta">Displacement current, energy & momentum of fields, Poynting vector</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">05</div><div class="topic-row-body"><div class="topic-row-title">Electromagnetic Waves</div><div class="topic-row-meta">Wave equation, polarization, reflection & refraction, waveguides</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">06</div><div class="topic-row-body"><div class="topic-row-title">Radiation & Antennas</div><div class="topic-row-meta">Retarded potentials, Larmor formula, multipole radiation</div></div><div class="topic-row-badge">Advanced</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">07</div><div class="topic-row-body"><div class="topic-row-title">Relativistic Electrodynamics</div><div class="topic-row-meta">Covariant formulation, field tensor, transformation of fields</div></div><div class="topic-row-badge">Advanced</div><div class="topic-row-arrow">→</div></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════ QUANTUM MECHANICS ════════════════════════════ -->
+<div class="page" id="page-quantum">
+  <section class="inner-hero">
+    <div class="inner-badge">🌊 &nbsp; Module 03</div>
+    <h1>Quantum Mechanics</h1>
+    <p>The highest-weightage subject. Master Dirac notation, approximation methods, and scattering theory for top scores in Part C.</p>
+  </section>
+
+  <div class="content-area">
+    <div class="info-grid">
+      <div class="info-card"><div class="info-card-label">Expected Questions</div><div class="info-card-val">14–18</div><div class="info-card-sub">Out of Part B+C</div></div>
+      <div class="info-card"><div class="info-card-label">Weightage</div><div class="info-card-val">~25%</div><div class="info-card-sub">In Part C</div></div>
+      <div class="info-card"><div class="info-card-label">Difficulty</div><div class="info-card-val">Very High</div><div class="info-card-sub">Conceptual depth</div></div>
+      <div class="info-card"><div class="info-card-label">Key Book</div><div class="info-card-val" style="font-size:0.9rem">Sakurai</div><div class="info-card-sub">Modern QM</div></div>
+    </div>
+
+    <div class="topic-row"><div class="topic-row-num">01</div><div class="topic-row-body"><div class="topic-row-title">Postulates & Wave Mechanics</div><div class="topic-row-meta">Schrödinger equation, probability current, uncertainty principle</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">02</div><div class="topic-row-body"><div class="topic-row-title">Dirac Notation & Operators</div><div class="topic-row-meta">Bra-ket formalism, Hermitian operators, eigenstates, completeness</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">03</div><div class="topic-row-body"><div class="topic-row-title">1D Potentials</div><div class="topic-row-meta">Infinite well, harmonic oscillator, tunneling, delta function potential</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">04</div><div class="topic-row-body"><div class="topic-row-title">Angular Momentum & Spin</div><div class="topic-row-meta">L operators, spherical harmonics, Pauli matrices, addition of angular momenta</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">05</div><div class="topic-row-body"><div class="topic-row-title">Hydrogen Atom</div><div class="topic-row-meta">Radial equation, energy levels, degeneracy, fine structure</div></div><div class="topic-row-badge">Important</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">06</div><div class="topic-row-body"><div class="topic-row-title">Time-Independent Perturbation Theory</div><div class="topic-row-meta">First & second order corrections, degenerate case, Stark & Zeeman effects</div></div><div class="topic-row-badge">High Priority</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">07</div><div class="topic-row-body"><div class="topic-row-title">Time-Dependent Perturbation Theory</div><div class="topic-row-meta">Fermi's golden rule, sudden & adiabatic approximation, selection rules</div></div><div class="topic-row-badge">Advanced</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">08</div><div class="topic-row-body"><div class="topic-row-title">Scattering Theory</div><div class="topic-row-meta">Born approximation, partial wave analysis, optical theorem, cross-section</div></div><div class="topic-row-badge">Advanced</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">09</div><div class="topic-row-body"><div class="topic-row-title">Identical Particles & Entanglement</div><div class="topic-row-meta">Bosons & fermions, Slater determinant, EPR, Bell's inequality</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════ THERMODYNAMICS ════════════════════════════ -->
+<div class="page" id="page-thermodynamics">
+  <section class="inner-hero">
+    <div class="inner-badge">🔥 &nbsp; Module 04</div>
+    <h1>Thermodynamics & Statistical Mechanics</h1>
+    <p>From entropy to phase transitions — the statistical underpinning of all macroscopic physics. Partition functions are the key to this unit.</p>
+  </section>
+
+  <div class="content-area">
+    <div class="info-grid">
+      <div class="info-card"><div class="info-card-label">Expected Questions</div><div class="info-card-val">10–13</div><div class="info-card-sub">Out of Part B+C</div></div>
+      <div class="info-card"><div class="info-card-label">Weightage</div><div class="info-card-val">~18%</div><div class="info-card-sub">In Part C</div></div>
+      <div class="info-card"><div class="info-card-label">Difficulty</div><div class="info-card-val">Medium–High</div><div class="info-card-sub">Conceptual</div></div>
+      <div class="info-card"><div class="info-card-label">Key Book</div><div class="info-card-val" style="font-size:0.9rem">Pathria</div><div class="info-card-sub">Stat. Mechanics</div></div>
+    </div>
+
+    <div class="topic-row"><div class="topic-row-num">01</div><div class="topic-row-body"><div class="topic-row-title">Laws of Thermodynamics</div><div class="topic-row-meta">Zeroth, first, second laws; entropy; Clausius inequality</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">02</div><div class="topic-row-body"><div class="topic-row-title">Thermodynamic Potentials</div><div class="topic-row-meta">Internal energy, enthalpy, Helmholtz & Gibbs free energy, Maxwell relations</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">03</div><div class="topic-row-body"><div class="topic-row-title">Kinetic Theory</div><div class="topic-row-meta">Maxwell–Boltzmann distribution, mean free path, transport phenomena</div></div><div class="topic-row-badge">Important</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">04</div><div class="topic-row-body"><div class="topic-row-title">Classical Statistical Mechanics</div><div class="topic-row-meta">Microcanonical, canonical, grand canonical ensembles; partition function</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">05</div><div class="topic-row-body"><div class="topic-row-title">Quantum Statistics</div><div class="topic-row-meta">Bose–Einstein and Fermi–Dirac distributions, density of states</div></div><div class="topic-row-badge">High Priority</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">06</div><div class="topic-row-body"><div class="topic-row-title">Phase Transitions</div><div class="topic-row-meta">First & second order transitions, Ising model, critical exponents, Landau theory</div></div><div class="topic-row-badge">Advanced</div><div class="topic-row-arrow">→</div></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════ MATHEMATICAL PHYSICS ════════════════════════════ -->
+<div class="page" id="page-mathematical">
+  <section class="inner-hero">
+    <div class="inner-badge">∑ &nbsp; Module 05</div>
+    <h1>Mathematical Physics</h1>
+    <p>The mathematical toolkit for all of physics. Though tested in Part A & B, a strong foundation here accelerates every other module.</p>
+  </section>
+
+  <div class="content-area">
+    <div class="info-grid">
+      <div class="info-card"><div class="info-card-label">Expected Questions</div><div class="info-card-val">6–9</div><div class="info-card-sub">Part A + B</div></div>
+      <div class="info-card"><div class="info-card-label">Weightage</div><div class="info-card-val">~12%</div><div class="info-card-sub">Overall</div></div>
+      <div class="info-card"><div class="info-card-label">Difficulty</div><div class="info-card-val">Medium</div><div class="info-card-sub">Tool-based</div></div>
+      <div class="info-card"><div class="info-card-label">Key Book</div><div class="info-card-val" style="font-size:0.9rem">Arfken</div><div class="info-card-sub">Math Methods</div></div>
+    </div>
+
+    <div class="topic-row"><div class="topic-row-num">01</div><div class="topic-row-body"><div class="topic-row-title">Vector Calculus</div><div class="topic-row-meta">Gradient, divergence, curl, theorems of Gauss, Stokes, and Green</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">02</div><div class="topic-row-body"><div class="topic-row-title">Complex Analysis</div><div class="topic-row-meta">Analytic functions, Cauchy's theorem, residue theorem, contour integration</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">03</div><div class="topic-row-body"><div class="topic-row-title">Differential Equations</div><div class="topic-row-meta">ODEs, PDEs, series solutions, Sturm–Liouville theory</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">04</div><div class="topic-row-body"><div class="topic-row-title">Special Functions</div><div class="topic-row-meta">Legendre, Bessel, Hermite, Laguerre polynomials; Gamma function</div></div><div class="topic-row-badge">Important</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">05</div><div class="topic-row-body"><div class="topic-row-title">Linear Algebra & Matrices</div><div class="topic-row-meta">Eigenvalues, diagonalization, unitary & Hermitian matrices, tensors</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">06</div><div class="topic-row-body"><div class="topic-row-title">Group Theory Basics</div><div class="topic-row-meta">Symmetry groups, representations, SU(2), rotation group, applications in QM</div></div><div class="topic-row-badge">Advanced</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">07</div><div class="topic-row-body"><div class="topic-row-title">Fourier & Laplace Transforms</div><div class="topic-row-meta">Fourier series, transforms, convolution, Green's functions</div></div><div class="topic-row-badge">Important</div><div class="topic-row-arrow">→</div></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════ SOLID STATE ════════════════════════════ -->
+<div class="page" id="page-solid-state">
+  <section class="inner-hero">
+    <div class="inner-badge">💎 &nbsp; Module 06</div>
+    <h1>Solid State Physics</h1>
+    <p>Crystal structures, electronic band theory, and modern condensed matter topics. Kittel is your bible for this unit.</p>
+  </section>
+
+  <div class="content-area">
+    <div class="info-grid">
+      <div class="info-card"><div class="info-card-label">Expected Questions</div><div class="info-card-val">7–10</div><div class="info-card-sub">Part B + C</div></div>
+      <div class="info-card"><div class="info-card-label">Weightage</div><div class="info-card-val">~15%</div><div class="info-card-sub">Overall</div></div>
+      <div class="info-card"><div class="info-card-label">Difficulty</div><div class="info-card-val">Medium</div><div class="info-card-sub">Factual + Theory</div></div>
+      <div class="info-card"><div class="info-card-label">Key Book</div><div class="info-card-val" style="font-size:0.9rem">Kittel</div><div class="info-card-sub">Intro to SSP</div></div>
+    </div>
+
+    <div class="topic-row"><div class="topic-row-num">01</div><div class="topic-row-body"><div class="topic-row-title">Crystal Structure & Symmetry</div><div class="topic-row-meta">Bravais lattices, Miller indices, X-ray diffraction, Bragg's law</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">02</div><div class="topic-row-body"><div class="topic-row-title">Lattice Dynamics & Phonons</div><div class="topic-row-meta">1D chain model, acoustic & optical branches, Debye & Einstein models</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">03</div><div class="topic-row-body"><div class="topic-row-title">Free Electron Theory</div><div class="topic-row-meta">Drude model, Sommerfeld model, Fermi energy, density of states</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">04</div><div class="topic-row-body"><div class="topic-row-title">Band Theory</div><div class="topic-row-meta">Bloch theorem, Brillouin zones, nearly-free electron model, effective mass</div></div><div class="topic-row-badge">Important</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">05</div><div class="topic-row-body"><div class="topic-row-title">Semiconductors</div><div class="topic-row-meta">Intrinsic & extrinsic, p-n junction, Hall effect, carrier dynamics</div></div><div class="topic-row-badge">Important</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">06</div><div class="topic-row-body"><div class="topic-row-title">Magnetism</div><div class="topic-row-meta">Dia-, para-, ferro-magnetism; Heisenberg model, Curie–Weiss law</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">07</div><div class="topic-row-body"><div class="topic-row-title">Superconductivity</div><div class="topic-row-meta">Meissner effect, London equations, BCS theory, Type I & II superconductors</div></div><div class="topic-row-badge">Advanced</div><div class="topic-row-arrow">→</div></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════ NUCLEAR & PARTICLE ════════════════════════════ -->
+<div class="page" id="page-nuclear">
+  <section class="inner-hero">
+    <div class="inner-badge">☢️ &nbsp; Module 07</div>
+    <h1>Nuclear & Particle Physics</h1>
+    <p>From nuclear binding energy to quarks and the Standard Model. Numerical questions on decay and Q-values are frequently asked.</p>
+  </section>
+
+  <div class="content-area">
+    <div class="info-grid">
+      <div class="info-card"><div class="info-card-label">Expected Questions</div><div class="info-card-val">5–8</div><div class="info-card-sub">Part B + C</div></div>
+      <div class="info-card"><div class="info-card-label">Weightage</div><div class="info-card-val">~10%</div><div class="info-card-sub">Overall</div></div>
+      <div class="info-card"><div class="info-card-label">Difficulty</div><div class="info-card-val">Medium</div><div class="info-card-sub">Factual + Num.</div></div>
+      <div class="info-card"><div class="info-card-label">Key Book</div><div class="info-card-val" style="font-size:0.9rem">Krane</div><div class="info-card-sub">Introductory NP</div></div>
+    </div>
+
+    <div class="topic-row"><div class="topic-row-num">01</div><div class="topic-row-body"><div class="topic-row-title">Nuclear Properties</div><div class="topic-row-meta">Size, shape, binding energy, semi-empirical mass formula (Bethe–Weizsäcker)</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">02</div><div class="topic-row-body"><div class="topic-row-title">Nuclear Models</div><div class="topic-row-meta">Liquid drop model, shell model, magic numbers, collective models</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">03</div><div class="topic-row-body"><div class="topic-row-title">Radioactive Decay</div><div class="topic-row-meta">Alpha, beta, gamma decay; decay law, Q-values, selection rules</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">04</div><div class="topic-row-body"><div class="topic-row-title">Nuclear Reactions</div><div class="topic-row-meta">Cross-sections, compound nucleus, fission, fusion, Q-value calculations</div></div><div class="topic-row-badge">Important</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">05</div><div class="topic-row-body"><div class="topic-row-title">Elementary Particles</div><div class="topic-row-meta">Hadrons & leptons, quarks, conservation laws, Feynman diagrams</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">06</div><div class="topic-row-body"><div class="topic-row-title">Standard Model Overview</div><div class="topic-row-meta">Gauge bosons, weak interaction, electroweak unification, Higgs mechanism</div></div><div class="topic-row-badge">Advanced</div><div class="topic-row-arrow">→</div></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════ ELECTRONICS ════════════════════════════ -->
+<div class="page" id="page-electronics">
+  <section class="inner-hero">
+    <div class="inner-badge">🔌 &nbsp; Module 08</div>
+    <h1>Electronics & Devices</h1>
+    <p>Analog and digital electronics, op-amp circuits, and microprocessor basics. This unit offers easy scoring with focused preparation.</p>
+  </section>
+
+  <div class="content-area">
+    <div class="info-grid">
+      <div class="info-card"><div class="info-card-label">Expected Questions</div><div class="info-card-val">5–7</div><div class="info-card-sub">Part B</div></div>
+      <div class="info-card"><div class="info-card-label">Weightage</div><div class="info-card-val">~8%</div><div class="info-card-sub">Overall</div></div>
+      <div class="info-card"><div class="info-card-label">Difficulty</div><div class="info-card-val">Low–Medium</div><div class="info-card-sub">Easy scoring</div></div>
+      <div class="info-card"><div class="info-card-label">Key Book</div><div class="info-card-val" style="font-size:0.9rem">Boylestad</div><div class="info-card-sub">Electronics</div></div>
+    </div>
+
+    <div class="topic-row"><div class="topic-row-num">01</div><div class="topic-row-body"><div class="topic-row-title">Semiconductor Devices</div><div class="topic-row-meta">p-n diode, Zener diode, BJT & FET operation, biasing, characteristics</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">02</div><div class="topic-row-body"><div class="topic-row-title">Amplifiers & Oscillators</div><div class="topic-row-meta">Common-emitter amplifier, feedback, Barkhausen criterion, RC & LC oscillators</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">03</div><div class="topic-row-body"><div class="topic-row-title">Operational Amplifiers</div><div class="topic-row-meta">Ideal op-amp, inverting/non-inverting configs, integrator, differentiator, filters</div></div><div class="topic-row-badge">High Priority</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">04</div><div class="topic-row-body"><div class="topic-row-title">Digital Electronics</div><div class="topic-row-meta">Boolean algebra, logic gates, combinational circuits, flip-flops, counters</div></div><div class="topic-row-badge">Core</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">05</div><div class="topic-row-body"><div class="topic-row-title">A/D & D/A Converters</div><div class="topic-row-meta">DAC/ADC types, resolution, sampling theorem, Nyquist frequency</div></div><div class="topic-row-badge">Important</div><div class="topic-row-arrow">→</div></div>
+    <div class="topic-row"><div class="topic-row-num">06</div><div class="topic-row-body"><div class="topic-row-title">Microprocessor Basics</div><div class="topic-row-meta">8085 architecture, instruction set, memory interfacing, I/O operations</div></div><div class="topic-row-badge">Supplementary</div><div class="topic-row-arrow">→</div></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ PREVIOUS YEAR QUESTIONS ════════════════════════════ -->
+<div class="page" id="page-pyq">
+  <section class="inner-hero">
+    <div class="inner-badge" style="color:var(--accent4);border-color:rgba(255,201,107,0.3)">📄 &nbsp; PYQ Archive</div>
+    <h1>Previous Year<br>Questions</h1>
+    <p>Solved questions from CSIR NET June & December sessions (2013–2024). Click any question to reveal the detailed answer.</p>
+  </section>
+
+  <div class="content-area">
+    <!-- Filter tabs -->
+    <div class="filter-tabs">
+      <div class="filter-tab active" onclick="filterPYQ('all',this)">All Years</div>
+      <div class="filter-tab" onclick="filterPYQ('2024',this)">2024</div>
+      <div class="filter-tab" onclick="filterPYQ('2023',this)">2023</div>
+      <div class="filter-tab" onclick="filterPYQ('2022',this)">2022</div>
+      <div class="filter-tab" onclick="filterPYQ('2021',this)">2021</div>
+      <div class="filter-tab" onclick="filterPYQ('2019',this)">2019</div>
+      <div class="filter-tab" onclick="filterPYQ('2018',this)">2018</div>
+    </div>
+
+    <!-- 2024 -->
+    <div class="pyq-year-group" data-year="2024">
+      <div class="pyq-year-header" onclick="toggleYear(this)">
+        <div class="pyq-year-label">
+          <span style="color:var(--accent4)">2024</span>
+          <span style="color:var(--muted);font-weight:400;font-size:0.85rem">June Session</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div class="pyq-year-meta">5 QUESTIONS</div>
+          <div class="pyq-chevron">▼</div>
+        </div>
+      </div>
+      <div class="pyq-questions">
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q1</div>
+            <div class="pyq-q-text">A particle moves under a central force F(r) = −kr. The orbit of the particle is an ellipse with the force centre at the centre (not focus) of the ellipse. The time period T of the orbit depends on the semi-major axis a and semi-minor axis b as:</div>
+            <div class="pyq-q-tag">Classical Mech.</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">For F = −kr (linear restoring force), both x and y equations reduce to simple harmonic motion: ẍ = −(k/m)x and ÿ = −(k/m)y. Since ω is the same in both directions, the period <strong>T = 2π√(m/k)</strong>, which is independent of a and b. The orbit is an ellipse centered at the force centre (unlike the Kepler case), and the period has no dependence on the shape of the ellipse.</div>
+          </div>
+        </div>
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q2</div>
+            <div class="pyq-q-text">The ground state energy of a particle in an infinite square well of width L is E₁. If the width is suddenly doubled to 2L, what is the probability that the particle is found in the ground state of the new well?</div>
+            <div class="pyq-q-tag">Quantum Mech.</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">The overlap integral ⟨ψ₁(new)|ψ₁(old)⟩ = ∫₀ᴸ √(2/2L) sin(πx/2L) · √(2/L) sin(πx/L) dx. Evaluating this gives <strong>8√2 / (3π) ≈ 0.9003</strong>. The probability is the square of this: P = (8√2/3π)² ≈ <strong>0.81 or 81%</strong>. The wave function of the old ground state has significant overlap with the new ground state because both are concentrated in the left half of the new well.</div>
+          </div>
+        </div>
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q3</div>
+            <div class="pyq-q-text">For a canonical ensemble, the Helmholtz free energy F is related to the partition function Z by F = −kT ln Z. For a 3D harmonic oscillator at high temperature, F scales with T as:</div>
+            <div class="pyq-q-tag">Stat. Mech.</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">At high T, the 3D harmonic oscillator partition function Z = (kT/ℏω)³ (classical limit). Therefore F = −kT ln Z = −3kT ln(kT/ℏω). Expanding: F = −3kT ln(kT) + 3kT ln(ℏω). The dominant term is <strong>F ∝ −T ln T</strong>, so F decreases roughly linearly with T (with a logarithmic correction). The entropy S = −∂F/∂T = 3k[1 + ln(kT/ℏω)] grows logarithmically.</div>
+          </div>
+        </div>
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q4</div>
+            <div class="pyq-q-text">An electromagnetic wave is incident normally on an interface between two media with refractive indices n₁ and n₂. The reflectance R is given by R = [(n₁−n₂)/(n₁+n₂)]². For n₁ = 1 and n₂ = 1.5, calculate R.</div>
+            <div class="pyq-q-tag">Electrodynamics</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">Substituting directly: R = [(1 − 1.5)/(1 + 1.5)]² = [−0.5/2.5]² = [−0.2]² = <strong>0.04 or 4%</strong>. This means 4% of the incident intensity is reflected at an air-glass interface, which matches the experimental observation (~4% for each surface of an optical lens). This is the Fresnel reflectance formula for normal incidence derived from Maxwell's boundary conditions.</div>
+          </div>
+        </div>
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q5</div>
+            <div class="pyq-q-text">The Fermi energy of copper is 7 eV. Estimate the velocity of electrons at the Fermi level. (mₑ = 9.1×10⁻³¹ kg)</div>
+            <div class="pyq-q-tag">Solid State</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">Using EF = ½mₑvF², we get vF = √(2EF/mₑ). EF = 7 eV = 7 × 1.6×10⁻¹⁹ J = 1.12×10⁻¹⁸ J. vF = √(2 × 1.12×10⁻¹⁸ / 9.1×10⁻³¹) = √(2.46×10¹²) ≈ <strong>1.57 × 10⁶ m/s</strong>. This is ~0.5% of the speed of light, validating the non-relativistic treatment for copper electrons.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2023 -->
+    <div class="pyq-year-group" data-year="2023">
+      <div class="pyq-year-header" onclick="toggleYear(this)">
+        <div class="pyq-year-label">
+          <span style="color:var(--accent4)">2023</span>
+          <span style="color:var(--muted);font-weight:400;font-size:0.85rem">December Session</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div class="pyq-year-meta">4 QUESTIONS</div>
+          <div class="pyq-chevron">▼</div>
+        </div>
+      </div>
+      <div class="pyq-questions">
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q1</div>
+            <div class="pyq-q-text">The Hamiltonian of a system is H = p²/2m + ½mω²x² + λx⁴. Using first-order perturbation theory, the correction to the ground state energy is:</div>
+            <div class="pyq-q-tag">Quantum Mech.</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">The perturbation is H' = λx⁴. The first-order correction is E¹ = ⟨0|λx⁴|0⟩. Using x = √(ℏ/2mω)(a† + a) and the identity ⟨0|x⁴|0⟩ = 3(ℏ/2mω)², we get <strong>E¹ = 3λℏ²/4m²ω²</strong>. The calculation uses ⟨0|(a†+a)⁴|0⟩ = 3, which comes from counting all contractions using Wick's theorem.</div>
+          </div>
+        </div>
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q2</div>
+            <div class="pyq-q-text">In the Lagrangian L = ½m(ẋ² + ẏ²) − V(x,y), if V is independent of x (i.e., ∂V/∂x = 0), what is the conserved quantity and its physical interpretation?</div>
+            <div class="pyq-q-tag">Classical Mech.</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">From the Euler–Lagrange equation, ∂L/∂x = 0 implies d/dt(∂L/∂ẋ) = 0, so ∂L/∂ẋ = mẋ = constant. The conserved quantity is the <strong>x-component of linear momentum pₓ = mẋ</strong>. By Noether's theorem, the translational symmetry in x (cyclic coordinate) gives conservation of the conjugate momentum. This is a direct application of the connection between symmetry and conservation laws.</div>
+          </div>
+        </div>
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q3</div>
+            <div class="pyq-q-text">A nucleus undergoes beta decay: ⁶⁰Co → ⁶⁰Ni + e⁻ + ν̄ₑ. The Q-value of this decay is 2.82 MeV. What type of beta decay is this and what is the maximum kinetic energy of the emitted electron?</div>
+            <div class="pyq-q-tag">Nuclear Physics</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">This is <strong>β⁻ decay</strong> (neutron → proton + electron + antineutrino), as Z increases from 27 to 28. The maximum kinetic energy of the electron equals the Q-value minus the recoil energy of the daughter nucleus (negligible for heavy nuclei). So <strong>KE_max ≈ Q = 2.82 MeV</strong>. In practice, the electron energy spectrum is continuous from 0 to Q, with the neutrino carrying the remaining energy — this was Pauli's key insight that led to the neutrino hypothesis.</div>
+          </div>
+        </div>
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q4</div>
+            <div class="pyq-q-text">The residue of f(z) = e^z / z³ at z = 0 is:</div>
+            <div class="pyq-q-tag">Mathematical Physics</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">Expand eᶻ as a Taylor series: eᶻ = 1 + z + z²/2! + z³/3! + ... So f(z) = eᶻ/z³ = z⁻³ + z⁻² + (1/2)z⁻¹ + 1/6 + ... The residue is the coefficient of z⁻¹, which is <strong>1/2</strong>. By the residue theorem, the contour integral ∮f(z)dz = 2πi × (1/2) = πi. This is a pole of order 3 at z = 0.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2022 -->
+    <div class="pyq-year-group" data-year="2022">
+      <div class="pyq-year-header" onclick="toggleYear(this)">
+        <div class="pyq-year-label">
+          <span style="color:var(--accent4)">2022</span>
+          <span style="color:var(--muted);font-weight:400;font-size:0.85rem">June Session</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div class="pyq-year-meta">3 QUESTIONS</div>
+          <div class="pyq-chevron">▼</div>
+        </div>
+      </div>
+      <div class="pyq-questions">
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q1</div>
+            <div class="pyq-q-text">The critical temperature Tᶜ for Bose–Einstein condensation in 3D for N bosons in a box of volume V is proportional to:</div>
+            <div class="pyq-q-tag">Stat. Mech.</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">For BEC, the condition is n = N/V = 2.612/λ³_dB where λ_dB = h/√(2πmkT). Solving for T: <strong>Tᶜ = (h²/2πmk)(N/2.612V)^(2/3)</strong>. So Tᶜ ∝ (N/V)^(2/3) ∝ n^(2/3). Higher number density means higher Tᶜ. For ⁸⁷Rb atoms in typical BEC experiments, this gives Tᶜ ~ 100 nK, consistent with experiments first achieved by Cornell and Wieman in 1995.</div>
+          </div>
+        </div>
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q2</div>
+            <div class="pyq-q-text">Using the Born approximation, the differential scattering cross-section dσ/dΩ for a Yukawa potential V(r) = V₀e^(−μr)/r is:</div>
+            <div class="pyq-q-tag">Quantum Mech.</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">In Born approximation, f(θ) = −(2m/ℏ²) × (1/4π) ∫V(r)e^(iq·r)d³r where q = 2k sin(θ/2). The Fourier transform of V₀e^(−μr)/r is 4πV₀/(q² + μ²). So f(θ) = −(2mV₀/ℏ²)/(q² + μ²) and <strong>dσ/dΩ = (2mV₀/ℏ²)² × 1/(4k²sin²(θ/2) + μ²)²</strong>. As μ → 0, this reduces to the Coulomb (Rutherford) scattering formula.</div>
+          </div>
+        </div>
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q3</div>
+            <div class="pyq-q-text">In a p-type semiconductor, the Hall coefficient RH is measured to be negative. Is this statement true or false? Explain.</div>
+            <div class="pyq-q-tag">Solid State</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text"><strong>False.</strong> The Hall coefficient RH = 1/(pq) for a p-type semiconductor, where p is the hole concentration and q is the elementary charge (positive). Since p > 0 and q > 0, RH is <strong>positive</strong> for p-type semiconductors. For n-type, the majority carriers are electrons (negative charge), so RH = −1/(nq) is negative. The sign of RH is a direct experimental way to determine the type of majority carriers in a semiconductor.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2021 -->
+    <div class="pyq-year-group" data-year="2021">
+      <div class="pyq-year-header" onclick="toggleYear(this)">
+        <div class="pyq-year-label">
+          <span style="color:var(--accent4)">2021</span>
+          <span style="color:var(--muted);font-weight:400;font-size:0.85rem">December Session</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div class="pyq-year-meta">3 QUESTIONS</div>
+          <div class="pyq-chevron">▼</div>
+        </div>
+      </div>
+      <div class="pyq-questions">
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q1</div>
+            <div class="pyq-q-text">A Carnot engine operates between temperatures T₁ = 800 K and T₂ = 300 K. What is its efficiency, and if it absorbs 1000 J from the hot source, how much work does it deliver?</div>
+            <div class="pyq-q-tag">Thermodynamics</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">Carnot efficiency η = 1 − T₂/T₁ = 1 − 300/800 = 1 − 0.375 = <strong>0.625 or 62.5%</strong>. Work delivered W = η × Q₁ = 0.625 × 1000 = <strong>625 J</strong>. Heat rejected to cold reservoir Q₂ = Q₁ − W = 375 J. The Carnot efficiency is the maximum possible for any engine operating between these temperatures — a consequence of the second law of thermodynamics.</div>
+          </div>
+        </div>
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q2</div>
+            <div class="pyq-q-text">The commutator [Lx, Ly] equals iℏLz. Using this, find [L², Lz] where L² = Lx² + Ly² + Lz².</div>
+            <div class="pyq-q-tag">Quantum Mech.</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">[L², Lz] = [Lx² + Ly² + Lz², Lz] = [Lx², Lz] + [Ly², Lz] + [Lz², Lz]. [Lz², Lz] = 0. [Lx², Lz] = Lx[Lx,Lz] + [Lx,Lz]Lx = Lx(−iℏLy) + (−iℏLy)Lx = −iℏ(LxLy + LyLx). [Ly², Lz] = Ly[Ly,Lz] + [Ly,Lz]Ly = Ly(iℏLx) + (iℏLx)Ly = iℏ(LyLx + LxLy). Adding: [L², Lz] = <strong>0</strong>. This means L² and Lz share simultaneous eigenstates |l,m⟩.</div>
+          </div>
+        </div>
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q3</div>
+            <div class="pyq-q-text">The Debye temperature of copper is θD = 343 K. At very low temperatures (T ≪ θD), the heat capacity Cv scales as:</div>
+            <div class="pyq-q-tag">Solid State</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">In the Debye model at low temperatures (T ≪ θD), only long-wavelength acoustic phonons are thermally excited. The heat capacity follows the <strong>Debye T³ law: Cv = (12π⁴Nk/5)(T/θD)³ ∝ T³</strong>. For copper at T = 10 K: Cv/Nk ≈ (12π⁴/5)(10/343)³ ≈ 0.0025. Including the electronic contribution (linear in T), total Cv = γT + AT³, and plotting Cv/T vs T² gives a straight line whose intercept is γ (Sommerfeld coefficient).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2019 -->
+    <div class="pyq-year-group" data-year="2019">
+      <div class="pyq-year-header" onclick="toggleYear(this)">
+        <div class="pyq-year-label">
+          <span style="color:var(--accent4)">2019</span>
+          <span style="color:var(--muted);font-weight:400;font-size:0.85rem">June Session</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div class="pyq-year-meta">3 QUESTIONS</div>
+          <div class="pyq-chevron">▼</div>
+        </div>
+      </div>
+      <div class="pyq-questions">
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q1</div>
+            <div class="pyq-q-text">Two inertial frames S and S' move with relative velocity v = 0.6c along x-axis. A rod of proper length L₀ = 2 m is at rest in S'. What is its length as measured in S?</div>
+            <div class="pyq-q-tag">Classical Mech.</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">Length contraction: L = L₀/γ where γ = 1/√(1 − v²/c²) = 1/√(1 − 0.36) = 1/√0.64 = 1/0.8 = 1.25. So <strong>L = 2/1.25 = 1.6 m</strong>. The rod appears shorter in the frame where it is moving. Note: the contraction is only along the direction of motion; transverse dimensions are unaffected. This is a consequence of the relativity of simultaneity, not a real physical compression.</div>
+          </div>
+        </div>
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q2</div>
+            <div class="pyq-q-text">An op-amp in inverting configuration has R_f = 100 kΩ and R_in = 10 kΩ. What is the closed-loop gain?</div>
+            <div class="pyq-q-tag">Electronics</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">For an ideal op-amp in inverting configuration, the closed-loop gain is <strong>Av = −Rf/Rin = −100k/10k = −10</strong>. The negative sign indicates phase inversion of 180°. The virtual ground concept: the inverting input is at virtual ground (≈0 V) due to negative feedback and high open-loop gain. The input current i = Vin/Rin all flows through Rf, giving Vout = −i×Rf = −(Rf/Rin)×Vin.</div>
+          </div>
+        </div>
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q3</div>
+            <div class="pyq-q-text">The binding energy per nucleon is maximum for iron-56 (⁵⁶Fe) at ~8.8 MeV/nucleon. Explain qualitatively why nuclei lighter or heavier than ⁵⁶Fe have lower binding energy per nucleon.</div>
+            <div class="pyq-q-tag">Nuclear Physics</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">For <strong>light nuclei</strong>: the surface term dominates — a larger fraction of nucleons are on the surface with fewer neighbours, reducing binding. For <strong>heavy nuclei</strong>: Coulomb repulsion between protons grows as Z², while the short-range strong force saturates. Beyond ⁵⁶Fe, the Coulomb penalty per nucleon exceeds any gain from adding nucleons, reducing BE/A. This is why fusion is energetically favourable for light nuclei (releasing energy going toward ⁵⁶Fe) and fission is favourable for heavy nuclei (releasing energy by splitting toward ⁵⁶Fe).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2018 -->
+    <div class="pyq-year-group" data-year="2018">
+      <div class="pyq-year-header" onclick="toggleYear(this)">
+        <div class="pyq-year-label">
+          <span style="color:var(--accent4)">2018</span>
+          <span style="color:var(--muted);font-weight:400;font-size:0.85rem">December Session</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div class="pyq-year-meta">2 QUESTIONS</div>
+          <div class="pyq-chevron">▼</div>
+        </div>
+      </div>
+      <div class="pyq-questions">
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q1</div>
+            <div class="pyq-q-text">A 2D electron gas has a constant density of states g(E) = m/πℏ². Find the Fermi energy at T = 0 for electron density n (per unit area).</div>
+            <div class="pyq-q-tag">Solid State</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">At T = 0, all states up to EF are filled: n = ∫₀^EF g(E) dE = (m/πℏ²) × EF. Solving: <strong>EF = πℏ²n/m</strong>. In 2D, the constant DOS means EF is simply proportional to n — unlike 3D where EF ∝ n^(2/3). This is a key feature of 2D materials like graphene (where DOS is linear in E, not constant) and has important implications for quantum Hall effect physics.</div>
+          </div>
+        </div>
+        <div class="pyq-item" onclick="togglePYQ(this)">
+          <div class="pyq-q">
+            <div class="pyq-q-num">Q2</div>
+            <div class="pyq-q-text">Legendre polynomial P₂(x) = ½(3x²−1). Verify the orthogonality: ∫₋₁¹ P₁(x)P₂(x)dx = 0, where P₁(x) = x.</div>
+            <div class="pyq-q-tag">Mathematical Physics</div>
+          </div>
+          <div class="pyq-answer">
+            <div class="pyq-answer-label">✦ Answer & Solution</div>
+            <div class="pyq-answer-text">∫₋₁¹ P₁(x)P₂(x)dx = ∫₋₁¹ x · ½(3x²−1)dx = ½∫₋₁¹(3x³−x)dx. Now 3x³ is an odd function and x is also odd — both are odd functions. The integral of any odd function over [−1,1] is zero. Therefore <strong>∫₋₁¹ P₁P₂ dx = 0 ✓</strong>. General orthogonality: ∫₋₁¹ Pₗ(x)Pₗ'(x)dx = 2/(2l+1) × δₗₗ'. This underlies the multipole expansion in electrostatics and quantum mechanics (spherical harmonics).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════ MOCK TEST ════════════════════════════ -->
+<div class="page" id="page-mock">
+  <section class="inner-hero">
+    <div class="inner-badge" style="color:#ff6fbb;border-color:rgba(255,111,187,0.3)">🧪 &nbsp; Mock Test Engine</div>
+    <h1>Mock Test</h1>
+    <p>Simulate the CSIR NET exam. Choose a topic-wise or mixed test, attempt questions, and get instant scored feedback with explanations.</p>
+  </section>
+
+  <div class="content-area">
+    <!-- Setup panel -->
+    <div class="quiz-setup" id="quizSetup">
+      <div class="info-grid" style="margin-bottom:1.5rem">
+        <div class="info-card"><div class="info-card-label">Format</div><div class="info-card-val" style="font-size:1rem">MCQ</div><div class="info-card-sub">Single correct answer</div></div>
+        <div class="info-card"><div class="info-card-label">Marking</div><div class="info-card-val" style="font-size:1rem">+2 / −⅔</div><div class="info-card-sub">Negative marking active</div></div>
+        <div class="info-card"><div class="info-card-label">Timer</div><div class="info-card-val" style="font-size:1rem">2 min/Q</div><div class="info-card-sub">Per question</div></div>
+        <div class="info-card"><div class="info-card-label">Mode</div><div class="info-card-val" style="font-size:1rem">Instant</div><div class="info-card-sub">Feedback after each Q</div></div>
+      </div>
+
+      <div class="mock-controls">
+        <select class="mock-select" id="topicSelect">
+          <option value="mixed">Mixed (All Topics)</option>
+          <option value="classical">Classical Mechanics</option>
+          <option value="quantum">Quantum Mechanics</option>
+          <option value="electrodynamics">Electrodynamics</option>
+          <option value="thermo">Thermodynamics & Stat. Mech.</option>
+          <option value="solid">Solid State Physics</option>
+          <option value="nuclear">Nuclear & Particle Physics</option>
+          <option value="math">Mathematical Physics</option>
+          <option value="electronics">Electronics</option>
+        </select>
+        <select class="mock-select" id="countSelect">
+          <option value="5">5 Questions</option>
+          <option value="10" selected>10 Questions</option>
+          <option value="15">15 Questions</option>
+        </select>
+        <button class="mock-start-btn" onclick="startQuiz()">Start Test →</button>
+      </div>
+
+      <div style="padding:1.5rem 1.8rem;background:var(--surface);border:1px solid var(--border);font-size:0.82rem;color:var(--muted);line-height:1.8">
+        <div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:var(--accent);margin-bottom:0.5rem">INSTRUCTIONS</div>
+        Each correct answer carries <strong style="color:var(--text)">+2 marks</strong>. Each wrong answer carries <strong style="color:var(--accent3)">−⅔ marks</strong>. Unattempted questions carry 0. The explanation is shown after you select an option. You cannot change your answer after selecting. Good luck!
+      </div>
+    </div>
+
+    <!-- Quiz engine -->
+    <div class="quiz-engine" id="quizEngine">
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="quiz-meta-row">
+        <div class="quiz-counter" id="quizCounter">Question 1 of 10</div>
+        <div class="quiz-timer" id="quizTimer">⏱ 2:00</div>
+      </div>
+      <div class="quiz-q-text" id="quizQText"></div>
+      <div class="quiz-q-unit" id="quizQUnit"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-explanation" id="quizExplanation"></div>
+      <button class="quiz-next-btn" id="quizNextBtn" onclick="nextQuestion()">Next Question →</button>
+    </div>
+
+    <!-- Results panel -->
+    <div class="quiz-result" id="quizResult">
+      <div style="text-align:center;padding:2rem 0">
+        <div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;color:var(--muted);margin-bottom:1.5rem;text-transform:uppercase">Test Complete</div>
+        <div class="result-ring">
+          <div class="result-score" id="resultScore">0</div>
+          <div class="result-of" id="resultOf">/ 0 pts</div>
+        </div>
+        <div class="result-grid">
+          <div class="result-cell"><div class="result-cell-val" id="resultCorrect" style="color:var(--accent2)">0</div><div class="result-cell-label">Correct</div></div>
+          <div class="result-cell"><div class="result-cell-val" id="resultWrong" style="color:var(--accent3)">0</div><div class="result-cell-label">Wrong</div></div>
+          <div class="result-cell"><div class="result-cell-val" id="resultSkipped" style="color:var(--muted)">0</div><div class="result-cell-label">Unattempted</div></div>
+        </div>
+        <div id="resultVerdict" style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.3rem;margin-bottom:2rem"></div>
+        <button class="result-retake-btn" onclick="retakeQuiz()">← Retake Test</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  /* ══════════ PAGE NAVIGATION ══════════ */
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('page-' + id);
+    if (target) target.classList.add('active');
+    const backBtn = document.getElementById('backBtn');
+    if (id === 'home') backBtn.classList.remove('visible');
+    else backBtn.classList.add('visible');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ══════════ PYQ ACCORDION ══════════ */
+  function toggleYear(header) {
+    const group = header.parentElement;
+    group.classList.toggle('open');
+  }
+
+  function togglePYQ(item) {
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.pyq-item.open').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  }
+
+  function filterPYQ(year, tabEl) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    tabEl.classList.add('active');
+    document.querySelectorAll('.pyq-year-group').forEach(g => {
+      g.style.display = (year === 'all' || g.dataset.year === year) ? 'block' : 'none';
+    });
+  }
+
+  /* ══════════ MOCK TEST / QUIZ ENGINE ══════════ */
+  const questionBank = [
+    // Classical Mechanics
+    { topic:'classical', unit:'Classical Mechanics', q:'A particle moves in a potential V(x) = ½kx². The time period of oscillation is:', opts:['T = 2π√(m/k)','T = 2π√(k/m)','T = π√(m/k)','T = 4π√(m/k)'], ans:0, exp:'For SHM with V = ½kx², F = −kx, so ω = √(k/m) and T = 2π/ω = 2π√(m/k). This is independent of amplitude — a hallmark of SHM. Angular frequency ω² = k/m.' },
+    { topic:'classical', unit:'Classical Mechanics', q:'For a free particle, the Hamiltonian H = p²/2m. Which of the following is a constant of motion?', opts:['Position x','Momentum p','x²','px + t'], ans:1, exp:'Since H has no explicit dependence on x, by Hamilton\'s equation ṗ = −∂H/∂x = 0, so momentum p is conserved. This reflects translational symmetry (Noether\'s theorem).' },
+    { topic:'classical', unit:'Classical Mechanics', q:'The Poisson bracket {q, H} for a Hamiltonian system gives:', opts:['0 always','-∂H/∂p','∂H/∂p','q̇ — the time evolution of q'], ans:3, exp:'{q, H} = ∂q/∂q · ∂H/∂p − ∂q/∂p · ∂H/∂q = 1 · ∂H/∂p − 0 = ∂H/∂p = q̇. This is Hamilton\'s equation. The Poisson bracket gives the time evolution of any observable.' },
+
+    // Quantum Mechanics
+    { topic:'quantum', unit:'Quantum Mechanics', q:'The expectation value ⟨x⟩ for the ground state of a quantum harmonic oscillator is:', opts:['ℏ/2mω','0','½ℏω','√(ℏ/mω)'], ans:1, exp:'The ground state ψ₀ is a symmetric (even) Gaussian. Since |ψ₀|² is even and x is odd, ∫x|ψ₀|²dx = 0. By symmetry, ⟨x⟩ = 0. Similarly ⟨p⟩ = 0 by the same argument.' },
+    { topic:'quantum', unit:'Quantum Mechanics', q:'The uncertainty principle states ΔxΔp ≥ ℏ/2. Which state saturates this bound (minimum uncertainty)?', opts:['Energy eigenstate of infinite well','Coherent state of harmonic oscillator','Momentum eigenstate','Spin-½ state'], ans:1, exp:'Coherent states |α⟩ of the harmonic oscillator are the minimum uncertainty states — they satisfy ΔxΔp = ℏ/2 exactly. They are eigenstates of the annihilation operator â|α⟩ = α|α⟩ and describe classical-like oscillating wave packets.' },
+    { topic:'quantum', unit:'Quantum Mechanics', q:'For a spin-½ particle, the eigenvalues of the operator Sz are:', opts:['0 and ℏ','+ℏ/2 and −ℏ/2','−ℏ and +ℏ','0 only'], ans:1, exp:'Sz has eigenvalues ±ℏ/2 corresponding to spin-up |↑⟩ and spin-down |↓⟩ states. The Pauli matrix σz = [[1,0],[0,−1]], and Sz = (ℏ/2)σz gives eigenvalues ℏ/2 and −ℏ/2.' },
+
+    // Electrodynamics
+    { topic:'electrodynamics', unit:'Electrodynamics', q:'Gauss\'s law in differential form for a medium with permittivity ε is:', opts:['∇·E = ρ/ε₀','∇·D = ρ_free','∇×E = 0','∇²φ = −ρ/ε'], ans:1, exp:'In a linear dielectric, D = εE where D is the electric displacement field. Gauss\'s law in differential form is ∇·D = ρ_free, where only free charges appear as sources. This is one of Maxwell\'s equations in matter. ∇·E = ρ_total/ε₀ is the vacuum form.' },
+    { topic:'electrodynamics', unit:'Electrodynamics', q:'An electromagnetic wave in vacuum has E = E₀cos(kz − ωt)x̂. The corresponding magnetic field B is:', opts:['B = E₀cos(kz−ωt)ŷ','B = (E₀/c)cos(kz−ωt)ŷ','B = E₀ccos(kz−ωt)ẑ','B = −(E₀/c)cos(kz−ωt)x̂'], ans:1, exp:'From Maxwell\'s equation ∇×E = −∂B/∂t, for a plane wave propagating in ẑ direction with E in x̂, B must be in ŷ direction. The relation |B| = |E|/c gives B = (E₀/c)cos(kz−ωt)ŷ. E, B, and k̂ form a right-handed orthogonal triad.' },
+
+    // Thermodynamics
+    { topic:'thermo', unit:'Thermodynamics & Stat. Mech.', q:'The Maxwell relation derived from the Helmholtz free energy F = U − TS is:', opts:['(∂S/∂V)_T = (∂P/∂T)_V','(∂T/∂V)_S = −(∂P/∂S)_V','(∂S/∂P)_T = −(∂V/∂T)_P','(∂T/∂P)_S = (∂V/∂S)_P'], ans:0, exp:'From dF = −SdT − PdV, the cross-derivatives give (∂S/∂V)_T = (∂P/∂T)_V. This is one of the four Maxwell relations, derived from the symmetry of second mixed partial derivatives (Schwarz\'s theorem). It connects entropy changes with pressure changes.' },
+    { topic:'thermo', unit:'Thermodynamics & Stat. Mech.', q:'For an ideal gas, the ratio of isothermal to adiabatic compressibility κ_T/κ_S equals:', opts:['1','γ (ratio of specific heats)','1/γ','Cp/R'], ans:1, exp:'κ_T = −(1/V)(∂V/∂P)_T = 1/P for ideal gas. κ_S = −(1/V)(∂V/∂P)_S = 1/(γP). Therefore κ_T/κ_S = γP/(P) = γ. The isothermal process allows more compression because heat can flow out, while the adiabatic process is stiffer (κ_S < κ_T).' },
+
+    // Solid State
+    { topic:'solid', unit:'Solid State Physics', q:'In a simple cubic lattice, the first Brillouin zone is a:', opts:['Sphere','Cube','Truncated octahedron','Rhombic dodecahedron'], ans:1, exp:'For a simple cubic direct lattice with lattice constant a, the reciprocal lattice is also simple cubic with spacing 2π/a. The first Brillouin zone is the Wigner-Seitz cell of the reciprocal lattice, which for a simple cubic reciprocal lattice is a cube spanning −π/a to +π/a in each direction.' },
+    { topic:'solid', unit:'Solid State Physics', q:'The Hall resistance in a 2D electron system in a strong magnetic field is quantized. This is known as:', opts:['Meissner effect','Quantum Hall effect','Josephson effect','Kondo effect'], ans:1, exp:'The Quantum Hall effect (von Klitzing, 1980) shows Hall resistance RH = h/(ne²) where n is an integer — quantized to extraordinary precision. It arises from Landau level quantization in 2D and topological properties. It has become the resistance standard and is linked to fundamental constants h and e.' },
+
+    // Nuclear
+    { topic:'nuclear', unit:'Nuclear & Particle Physics', q:'The binding energy per nucleon for ⁴He (alpha particle) is approximately 7.07 MeV. This relatively high value compared to neighbours explains:', opts:['Alpha decay is forbidden','Alpha particle is a magic number nucleus','Alpha decay is energetically favourable for heavy nuclei','Alpha particle has zero spin'], ans:1, exp:'⁴He has Z=2, N=2 — both are magic numbers (closed shells in the shell model). This gives ⁴He an anomalously high binding energy per nucleon (~7.07 MeV) compared to Li, Be etc. This is why alpha decay (emitting ⁴He) is energetically favourable for many heavy nuclei; the alpha particle takes away a large chunk of binding energy.' },
+    { topic:'nuclear', unit:'Nuclear & Particle Physics', q:'In the quark model, a proton consists of:', opts:['uud quarks','udd quarks','uus quarks','dds quarks'], ans:0, exp:'The proton has charge +1e, so it consists of two up quarks (u, charge +2/3e each) and one down quark (d, charge −1/3e): total charge = 2/3 + 2/3 − 1/3 = +1. The neutron is udd: 2/3 − 1/3 − 1/3 = 0. This quark model was developed by Gell-Mann and Zweig in 1964.' },
+
+    // Mathematical Physics
+    { topic:'math', unit:'Mathematical Physics', q:'The Fourier transform of f(t) = e^(−a|t|) for a > 0 is:', opts:['2a/(ω²+a²)','1/(ω²+a²)','2/(ω+a)','a/(ω²−a²)'], ans:0, exp:'F(ω) = ∫₋∞^∞ e^(−a|t|)e^(−iωt)dt = ∫₀^∞ e^(−at)e^(−iωt)dt + ∫₋∞^0 e^(at)e^(−iωt)dt = 1/(a+iω) + 1/(a−iω) = 2a/(a²+ω²). This is a Lorentzian in frequency space — a key result in spectroscopy and resonance physics.' },
+    { topic:'math', unit:'Mathematical Physics', q:'The eigenvalues of the matrix [[3,1],[1,3]] are:', opts:['2 and 4','3 and 3','1 and 5','0 and 6'], ans:0, exp:'Characteristic equation: det(A − λI) = (3−λ)² − 1 = 0 → (3−λ)² = 1 → 3−λ = ±1 → λ = 2 or λ = 4. Eigenvector for λ=2: (A−2I)v=0 → [[1,1],[1,1]]v=0 → v∝[1,−1]. Eigenvector for λ=4: v∝[1,1].' },
+
+    // Electronics
+    { topic:'electronics', unit:'Electronics', q:'An ideal op-amp has open-loop gain A → ∞. In a non-inverting configuration with R₁ = R₂, the closed-loop gain is:', opts:['1','2','∞','R₂/R₁'], ans:1, exp:'For a non-inverting amplifier, closed-loop gain Av = 1 + Rf/R₁. With Rf = R₂ = R₁, Av = 1 + 1 = 2. The output is in phase with the input (non-inverting). The feedback fraction β = R₁/(R₁+Rf) = 1/2, and for A→∞, Av = 1/β = 2.' },
+    { topic:'electronics', unit:'Electronics', q:'The NAND gate is called a universal gate because:', opts:['It operates at the highest speed','Any Boolean function can be implemented using only NAND gates','It consumes the least power','It has the simplest circuit'], ans:1, exp:'NAND (and NOR) are called universal gates because any logic function can be implemented using only these gates. NOT(A) = NAND(A,A). AND(A,B) = NOT(NAND(A,B)). OR(A,B) = NAND(NOT A, NOT B). This is fundamental to digital design — entire CPUs can theoretically be built from NAND gates alone.' },
+  ];
+
+  let quizQuestions = [];
+  let currentQ = 0;
+  let score = 0;
+  let correct = 0;
+  let wrong = 0;
+  let answered = false;
+  let timerInterval = null;
+  let timeLeft = 120;
+
+  function startQuiz() {
+    const topic = document.getElementById('topicSelect').value;
+    const count = parseInt(document.getElementById('countSelect').value);
+
+    let pool = topic === 'mixed' ? questionBank : questionBank.filter(q => q.topic === topic);
+    pool = pool.sort(() => Math.random() - 0.5);
+    quizQuestions = pool.slice(0, Math.min(count, pool.length));
+
+    currentQ = 0; score = 0; correct = 0; wrong = 0;
+
+    document.getElementById('quizSetup').style.display = 'none';
+    document.getElementById('quizEngine').style.display = 'block';
+    document.getElementById('quizResult').style.display = 'none';
+
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    if (currentQ >= quizQuestions.length) { showResult(); return; }
+    answered = false;
+    clearInterval(timerInterval);
+    timeLeft = 120;
+
+    const q = quizQuestions[currentQ];
+    const total = quizQuestions.length;
+
+    document.getElementById('quizCounter').textContent = `Question ${currentQ + 1} of ${total}`;
+    document.getElementById('progressFill').style.width = `${(currentQ / total) * 100}%`;
+    document.getElementById('quizQText').textContent = q.q;
+    document.getElementById('quizQUnit').textContent = '◉ ' + q.unit;
+    document.getElementById('quizExplanation').classList.remove('visible');
+    document.getElementById('quizExplanation').innerHTML = '';
+    document.getElementById('quizNextBtn').classList.remove('visible');
+
+    const letters = ['A', 'B', 'C', 'D'];
+    const optContainer = document.getElementById('quizOptions');
+    optContainer.innerHTML = '';
+    q.opts.forEach((opt, i) => {
+      const div = document.createElement('div');
+      div.className = 'quiz-option';
+      div.innerHTML = `<span class="quiz-option-letter">${letters[i]}</span>${opt}`;
+      div.onclick = () => selectOption(i, div);
+      optContainer.appendChild(div);
+    });
+
+    startTimer();
+  }
+
+  function startTimer() {
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      updateTimerDisplay();
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        if (!answered) autoSkip();
+      }
+    }, 1000);
+  }
+
+  function updateTimerDisplay() {
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    const el = document.getElementById('quizTimer');
+    el.textContent = `⏱ ${m}:${s.toString().padStart(2, '0')}`;
+    el.style.color = timeLeft <= 30 ? 'var(--accent3)' : 'var(--accent4)';
+  }
+
+  function autoSkip() {
+    answered = true;
+    document.querySelectorAll('.quiz-option').forEach(o => o.classList.add('disabled'));
+    showExplanation(-1);
+    document.getElementById('quizNextBtn').classList.add('visible');
+  }
+
+  function selectOption(index, el) {
+    if (answered) return;
+    answered = true;
+    clearInterval(timerInterval);
+
+    const q = quizQuestions[currentQ];
+    const options = document.querySelectorAll('.quiz-option');
+    options.forEach(o => o.classList.add('disabled'));
+
+    if (index === q.ans) {
+      el.classList.add('correct');
+      score += 2; correct++;
+    } else {
+      el.classList.add('wrong');
+      options[q.ans].classList.add('correct');
+      score -= (2/3); wrong++;
+    }
+
+    showExplanation(index);
+    document.getElementById('quizNextBtn').classList.add('visible');
+  }
+
+  function showExplanation(selected) {
+    const q = quizQuestions[currentQ];
+    const expEl = document.getElementById('quizExplanation');
+    const wasCorrect = selected === q.ans;
+    const wasSkipped = selected === -1;
+    const label = wasSkipped ? '⏱ Time up — Skipped' : wasCorrect ? '✓ Correct!' : '✗ Incorrect';
+    const color = wasSkipped ? 'var(--accent4)' : wasCorrect ? 'var(--accent2)' : 'var(--accent3)';
+    expEl.innerHTML = `<strong style="color:${color}">${label}</strong><br><br>${q.exp}`;
+    expEl.classList.add('visible');
+  }
+
+  function nextQuestion() {
+    currentQ++;
+    renderQuestion();
+  }
+
+  function showResult() {
+    clearInterval(timerInterval);
+    document.getElementById('quizEngine').style.display = 'none';
+    document.getElementById('quizResult').style.display = 'block';
+
+    const total = quizQuestions.length;
+    const maxScore = total * 2;
+    const displayScore = Math.max(0, Math.round(score * 10) / 10);
+    const skipped = total - correct - wrong;
+
+    document.getElementById('resultScore').textContent = displayScore;
+    document.getElementById('resultOf').textContent = `/ ${maxScore} pts`;
+    document.getElementById('resultCorrect').textContent = correct;
+    document.getElementById('resultWrong').textContent = wrong;
+    document.getElementById('resultSkipped').textContent = skipped;
+
+    const pct = (displayScore / maxScore) * 100;
+    let verdict, color;
+    if (pct >= 80) { verdict = '🏆 Excellent! JRF Ready'; color = 'var(--accent2)'; }
+    else if (pct >= 60) { verdict = '✅ Good. Keep Practicing'; color = 'var(--accent)'; }
+    else if (pct >= 40) { verdict = '📖 Average. Revisit Topics'; color = 'var(--accent4)'; }
+    else { verdict = '🔁 Needs More Work'; color = 'var(--accent3)'; }
+
+    document.getElementById('resultVerdict').innerHTML = `<span style="color:${color}">${verdict}</span>`;
+  }
+
+  function retakeQuiz() {
+    document.getElementById('quizResult').style.display = 'none';
+    document.getElementById('quizSetup').style.display = 'block';
+  }
+</script>
+
+</body>
+</html>
+
